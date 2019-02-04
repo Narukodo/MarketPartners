@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700');
+
+@font-face {
+  font-family: 'Brown';
+  src: local('Brown-Light'), url('./Brown-Light.woff') format('woff');
+  font-weight: lighter;
+}
+
+@font-face {
+  font-family: 'Brown';
+  src: local('Brown-Regular'), url('./Brown-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Brown';
+  src: local('Brown-Bold'), url('./Brown-Bold.woff') format('woff');
+  font-weight: bold;
+}
+
+* {
+  font-family: 'Montserrat';
+  font-weight: 300;
+}
