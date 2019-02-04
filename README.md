@@ -15,19 +15,9 @@ The app will run on `localhost:3007`
 
 Basic Auth in effect
 ---
-Username `setter`
-
-Password  `ziggy2020`
 
 ~~The react app will point to https://staging.api.setter.com/ once build
 Update .env~~
-
-
-.env controls the build path of the api
-for example the default is set to localhost to update for production use
-`REACT_APP_API_ORIGIN='https://staging.api.setter.com'`
----
-
 
 This is hosted on the VM `html-server` to access quickly use 
 `gcloud compute --project "beaming-night-139614" ssh --zone "us-east1-d" "html-server"`
