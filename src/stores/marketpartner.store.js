@@ -3,12 +3,12 @@ import { MarketPartnerAPI } from 'api'
 import { isNumber } from 'utils'
 import { pick, fill, zipObject, omit } from 'lodash'
 import { isEmail } from 'validator'
+import { consolidateStreamedStyles } from 'styled-components';
 
 configure({ enforceActions: true })
 
 class MarketPartnerStore {
-
-
+  a = 2;
   // _validator(field, value) {
   //   const properties = this._permittedParams[field]
   //   switch(properties){
@@ -96,17 +96,24 @@ class MarketPartnerStore {
     const body = this._pickPermittedParams(this)
 
     if(!body.redirect_url.includes('http')) body.redirect_url = `https://setter.com/${body.redirect_url}`
-    const bodySerialized = omit(body, 'id')
+    const bodySerialized = {...body, id: `${this.a}`}
+    this.a += 1
 
-    try {
-      if(create) {
-        await MarketPartnerAPI.create(bodySerialized)
-        this.getAllReferralInfo()
-      } else if(update) {
-        MarketPartnerAPI.update(this.id, bodySerialized)
+    if(create) {
+      try {
+        this.tableData.push(bodySerialized)
+      } catch (e){
+        this.tableData.push(bodySerialized)
       }
-    } catch(e){
-      console.log(e)
+      this.getAllReferralInfo()
+    } else if(update) {
+      try {
+        const toUpdate = this.tableData.findIndex(item => item.mkt_partner_name === bodySerialized.mkt_partner_name);
+        this.tableData[toUpdate] = bodySerialized
+      } catch (e) {
+        const toUpdate = this.tableData.findIndex(item => item.mkt_partner_name === bodySerialized.mkt_partner_name);
+        this.tableData[toUpdate] = bodySerialized
+      }
     }
   }
 
@@ -125,25 +132,64 @@ class MarketPartnerStore {
   @action populateTable = items => items.forEach(item => this.tableData.push(item))
 
   @action getAllReferralInfo = async () => {
-    this.clearTable()
+    // this.clearTable()
     try {
-      const referrals = await MarketPartnerAPI.all()
-      if(!!referrals) console.log('Got referrals', referrals) || this.populateTable(referrals)
-      return referrals
+      if(!this.tableData || this.tableData.length === 0){
+        const referrals = [{
+          id: '1',
+          mkt_partner_name: 'Test',
+          redirect_url: 'http://test.setter.com/test',
+          landing_page_url: 'http://hello.setter.com/test',
+          internal_note: 'This is for ops team use only',
+          app_description: 'description of the referral in the app',
+          phone_number: 'under contact',
+          reporting_email: 'test@test.com',
+          credit_amount: 123,
+          init_message: 'The introductory message the partner will use to greet their client'
+        }];
+        this.populateTable(referrals)
+        return referrals
+      }
+      return this.tableData
+      // const referrals = await MarketPartnerAPI.all()
     } catch (e) {
-      console.log(e)
-      this.setValue('isUp', false)
+      if(!this.tableData || this.tableData.length === 0){
+        const referrals = [{
+          id: '1',
+          mkt_partner_name: 'Test',
+          redirect_url: 'http://test.setter.com/test',
+          landing_page_url: 'http://hello.setter.com/test',
+          internal_note: 'This is for ops team use only',
+          app_description: 'description of the referral in the app',
+          phone_number: 'under contact',
+          reporting_email: 'test@test.com',
+          credit_amount: 123,
+          init_message: 'The introductory message the partner will use to greet their client'
+        }];
+        this.populateTable(referrals)
+      }
+      return this.tableData
+      // this.setValue('isUp', false)
     }
   }
 
   @action getReferralInfo = async (id) => {
-    const referral = await MarketPartnerAPI.get(id)
-    Object.keys(referral).forEach(key => this.setValue(key, referral[key]))
-    this.setValue('id', referral.id)
-    this.setValue('chat_url', `https://welcome.setter.com/${referral.id}`)
-    this.setValue('redirect_url', referral.redirect_url)
-    this.setValue('landing_page_url', referral.landing_page_url)
-    return referral
+    // const referral = await MarketPartnerAPI.get(id)
+    console.log(this.tableData.findIndex(item => {
+      console.log(item.id, id)
+      return item.id === id
+    }));
+    const referral = this.tableData[this.tableData.findIndex(item => item.id === id)]
+    console.log(referral)
+    if (referral)
+    {
+      Object.keys(referral).forEach(key => this.setValue(key, referral[key]))
+      this.setValue('id', referral.id)
+      this.setValue('chat_url', `https://welcome.setter.com/${referral.id}`)
+      this.setValue('redirect_url', referral.redirect_url)
+      this.setValue('landing_page_url', referral.landing_page_url)
+      return referral
+    }
   }
 }
 
